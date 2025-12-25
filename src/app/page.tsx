@@ -1,103 +1,120 @@
-import Image from "next/image";
+'use client' // クライアント側で動作する（ブラウザ上で実行される）Reactコンポーネント
 
-export default function Home() {
+// フックのインポート
+import { useState } from 'react' // useState: コンポーネントの状態を保つ
+import { supabase } from '@/lib/supabaseClient' // Supabaseクライアントのインスタンス（API通信）
+import { useRouter } from 'next/navigation'
+
+export default function AddExpensePage() {
+  const router = useRouter()
+
+  /*
+  React Hooks (useState)
+  ・フォームの入力内容を一時的に保管する箱。
+  ・入力が変わるたびにsetState()で状態を更新。
+  ・amount: 金額は数値だが、最初は空文字でも受け取れるようにnumber | ''としておく。Number(e.target.value)で明示的に数値へ変換。
+  */
+  const [date, setDate] = useState('')
+  const [category, setCategory] = useState('')
+  const [amount, setAmount] = useState<number | ''>('')
+  const [paymentMethod, setPaymentMethod] = useState('')
+  const [memo, setMemo] = useState('')
+
+  /*
+  handleSubmit(フォーム送信処理)
+  ・e.preventDefault(): フォーム送信時にブラウザのリロードを防止する。
+  ・必須項目のチェックをした上で、supabase.from(テーブル).insert([各カラム値])で新しいデータを挿入する。
+  ・成功すればrouter.push('/')でトップページに戻る。
+  */
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!date || !category || !amount) {
+      alert('日付、カテゴリ、金額は必須です')
+      return
+    }
+
+    const { error } = await supabase.from('expenses').insert([
+      {
+        date,
+        category,
+        amount: Number(amount),
+        payment_method: paymentMethod,
+        memo,
+      },
+    ])
+
+    if (error) {
+      alert('保存に失敗しました')
+      console.error(error)
+    } else {
+      router.push('/') //登録後トップページへ移動
+    }
+  }
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="p-4 max-w-md mx-auto">
+      <h1 className="text-xl font-bold mb-4">支出を追加</h1>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium">日付</label>
+          <input
+            type="date"
+            value={date} // 現在の入力値をdate状態にバインド
+            onChange={(e) => setDate(e.target.value)} // 値が変更されたときにsetDateを使って更新
+            /*
+            Tailwind CSSの書き方
+            ・w-full：幅100%
+            ・border：枠線
+            ・p-2：padding（内側の余白）
+            ・rounded：角を丸くする
+            ※他にも bg-blue-600, text-sm, hover:bg-blue-700 などで見た目を細かく調整できる。
+            */
+            className="w-full border p-2 rounded"
+            required
+          />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+        <div>
+          <label className="block text-sm font-medium">カテゴリ</label>
+          <input
+            type="text"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="w-full border p-2 rounded"
+            required
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
+        </div>
+        <div>
+          <label className="block text-sm font-medium">金額</label>
+          <input
+            type="number"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value === '' ? '' : Number(e.target.value))}
+            className="w-full border p-2 rounded"
+            required
           />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
+        </div>
+        <div>
+          <label className="block text-sm font-medium">支払い方法</label>
+          <input
+            type="text"
+            value={paymentMethod}
+            onChange={(e) => setPaymentMethod(e.target.value)}
+            className="w-full border p-2 rounded"
           />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        </div>
+        <div>
+          <label className="block text-sm font-medium">メモ</label>
+          <textarea
+            value={memo}
+            onChange={(e) => setMemo(e.target.value)}
+            className="w-full border p-2 rounded"
+          />
+        </div>
+        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+          登録する
+        </button>
+      </form>
     </div>
-  );
+  )
 }
