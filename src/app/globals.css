@@ -52,3 +52,37 @@ select:focus,
 input[type="date"]:focus {
   outline: none;
 }
+
+/* モーダル・オーバーレイフェードイン */
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* モーダル ポップアップ */
+@keyframes popUp {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* リスト項目フェード＆スライド */
+@keyframes listPop {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-overlay {
+  animation: overlayFadeIn 220ms ease-out forwards;
+}
+
+.modal-content {
+  animation: popUp 260ms cubic-bezier(.2,.9,.3,1) forwards;
+}
+
+/* 各リスト項目に付与する汎用クラス。
+   animation-delay は inline style で制御します（既に page.tsx で set しています） */
+.animate-list-item {
+  opacity: 0;
+  transform: translateY(8px);
+  animation: listPop 360ms cubic-bezier(.2,.9,.3,1) forwards;
+}
