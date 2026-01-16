@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import AddExpenseForm from './AddExpenseForm'
 
+// トップページ
 export default function HomePage() {
   const [expenses, setExpenses] = useState<any[]>([])
   const [isOpen, setIsOpen] = useState(false)
@@ -14,19 +15,7 @@ export default function HomePage() {
 
     const { data, error } = await supabase
       .from('expenses')
-      .select(`
-        date,
-        amount,
-        title,
-        categories (
-          id,
-          name
-        ),
-        payment_methods (
-          id,
-          name
-        )
-      `)
+      .select(`*`)
       .order('date', { ascending: false })
 
     if (!error) {
@@ -57,7 +46,7 @@ export default function HomePage() {
       <ul className="space-y-2">
         {expenses.map((e) => (
           <li key={e.id} className="border p-2 rounded">
-            {e.date} / {e.category_id} / ¥{e.amount}
+            {e.date} / {e.title} / ¥{e.amount}
           </li>
         ))}
       </ul>
