@@ -9,9 +9,7 @@ export default function AddExpenseForm({
   onSuccess: () => void
 }) {
   const [date, setDate] = useState('')
-  const [category_id, setCategory_id] = useState('')
   const [amount, setAmount] = useState<number | ''>('')
-  const [payment_method_id, setPayment_method_id] = useState('')
   const [title, setTitle] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
 
@@ -41,9 +39,9 @@ export default function AddExpenseForm({
 
     setSuccessMessage('登録しました')
     setDate('')
-    setCategory_id('')
+    setCategoryId('')
     setAmount('')
-    setPayment_method_id('')
+    setPaymentMethodId('')
     setTitle('')
 
     setTimeout(onSuccess, 800)
