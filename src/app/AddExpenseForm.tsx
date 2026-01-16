@@ -7,10 +7,8 @@ import AmountCalculator from './AmountCalculator'
 
 export default function AddExpenseForm({
   onSuccess,
-  onClose,
 }: {
   onSuccess: () => void
-  onClose?: () => void
 }) {
   const [date, setDate] = useState('')
   const [expression, setExpression] = useState('')

@@ -6,8 +6,16 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
 import { supabase } from '@/lib/supabaseClient'
 
 ChartJS.register(ArcElement, Tooltip, Legend)
+type ExpenseItem = {
+  category_id: number | null
+  amount: number | null
+}
 
-export default function CategoryPieChart({ items }: { items: any[] }) {
+export default function CategoryPieChart({
+  items,
+}: {
+  items: ExpenseItem[]
+}) {
   const [categories, setCategories] = useState<{ id: number; name: string }[]>([])
 
   useEffect(() => {
@@ -19,21 +27,19 @@ export default function CategoryPieChart({ items }: { items: any[] }) {
   }, [])
 
   const { labels, data } = useMemo(() => {
-    const map = new Map<number | string, number>()
+    const map = new Map<number, number>()
     for (const it of items) {
-      const cid = it.category_id ?? '未分類'
+      const cid = it.category_id ?? -1
       map.set(cid, (map.get(cid) ?? 0) + Number(it.amount ?? 0))
     }
 
-    const entries = Array.from(map.entries()).sort((a, b) => (b[1] as number) - (a[1] as number))
+    const entries = Array.from(map.entries()).sort((a, b) => b[1] - a[1])
     const labels = entries.map(([cid]) => {
-      if (typeof cid === 'number') {
-        const found = categories.find((c) => c.id === cid)
-        return found ? found.name : `カテゴリ ${cid}`
-      }
-      return String(cid)
+    if (cid === -1) return '未分類'
+    const found = categories.find((c) => c.id === cid)
+    return found ? found.name : `カテゴリ ${cid}`
     })
-    const data = entries.map(([, v]) => v as number)
+    const data = entries.map(([, v]) => v)
 
     return { labels, data }
   }, [items, categories])

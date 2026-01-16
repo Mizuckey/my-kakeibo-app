@@ -6,8 +6,17 @@ import { supabase } from '@/lib/supabaseClient'
 import AddExpenseForm from './AddExpenseForm'
 import CategoryPieChart from './CategoryPieChart'
 
+type Expense = {
+  id: number
+  date: string
+  title: string | null
+  amount: number
+  category_id: number | null
+  payment_method_id: number | null
+}
+
 export default function HomePage() {
-  const [expenses, setExpenses] = useState<any[]>([])
+  const [expenses, setExpenses] = useState<Expense[]>([])
   const [isOpen, setIsOpen] = useState(false)
   const [displayMonth, setDisplayMonth] = useState(() => {
     const d = new Date()
@@ -94,7 +103,7 @@ export default function HomePage() {
           {itemsForMonth.length === 0 && <div className="text-gray-500">データがありません</div>}
 
           <ul className="w-full space-y-2 list-content">
-            {itemsForMonth.map((e: any, idx: number) => (
+            {itemsForMonth.map((e: Expense, idx) => (
               <li
                 key={e.id}
                 className="w-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 rounded animate-list-item"
