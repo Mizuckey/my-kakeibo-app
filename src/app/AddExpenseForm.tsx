@@ -1,7 +1,9 @@
+// 登録フォーム
 'use client'
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
+import AmountCalculator from './AmountCalculator'
 
 export default function AddExpenseForm({
   onSuccess,
@@ -9,7 +11,7 @@ export default function AddExpenseForm({
   onSuccess: () => void
 }) {
   const [date, setDate] = useState('')
-  const [amount, setAmount] = useState<number | ''>('')
+  const [expression, setExpression] = useState('') // 例: "100+200*2"
   const [title, setTitle] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
 
@@ -27,7 +29,7 @@ export default function AddExpenseForm({
         date,
         category_id: categoryId,
         payment_method_id: paymentMethodId,
-        amount: Number(amount),
+        amount: Number(expression),
         title,
       },
     ])
@@ -40,7 +42,7 @@ export default function AddExpenseForm({
     setSuccessMessage('登録しました')
     setDate('')
     setCategoryId('')
-    setAmount('')
+    setExpression('')
     setPaymentMethodId('')
     setTitle('')
 
@@ -125,13 +127,17 @@ export default function AddExpenseForm({
       </select>
 
       <input
-        type="number"
-        value={amount}
+        type="text"
+        inputMode="numeric"
+        value={expression}
         onChange={(e) =>
-          e.target.value === '' ? setAmount('') : setAmount(Number(e.target.value))
+          setExpression(e.target.value.replace(/[^0-9+\-*/.]/g, ''))
         }
-        placeholder="金額"
-        className="w-full border p-2 rounded bg-white text-gray-900 border-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="w-full border p-2 rounded text-right text-xl"
+      />
+      <AmountCalculator
+        value={expression}
+        onChange={setExpression}
       />
 
       <button

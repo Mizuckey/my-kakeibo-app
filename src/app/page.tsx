@@ -1,3 +1,4 @@
+// 一覧ページ
 'use client'
 
 import { useEffect, useState } from 'react'
