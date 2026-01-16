@@ -86,3 +86,23 @@ input[type="date"]:focus {
   transform: translateY(8px);
   animation: listPop 360ms cubic-bezier(.2,.9,.3,1) forwards;
 }
+
+/* モダンなくすみボタン */
+.btn-muted {
+  background: hsl(190 12% 42%); /* くすんだ青緑系 */
+  color: #ffffff;
+  transition: filter .12s ease, transform .12s ease;
+}
+.btn-muted:hover {
+  filter: brightness(0.96);
+  transform: translateY(-1px);
+}
+.dark .btn-muted {
+  background: hsl(190 10% 34%); /* ダークモード調整 */
+}
+
+/* 必要に応じてボタンのテキスト色や影を微調整 */
+.btn-muted:active {
+  transform: translateY(0);
+  filter: brightness(0.92);
+}

@@ -42,8 +42,9 @@ export default function CategoryPieChart({ items }: { items: any[] }) {
     return <div className="text-sm text-gray-500">カテゴリデータがありません</div>
   }
 
+  // くすみトーンのパレット（低彩度・中明度）
   const bgColors = labels.map((_, i) =>
-    `hsl(${(i * 57) % 360}deg 70% 55% / 1)`
+    `hsl(${(i * 47) % 360} 25% 58%)`
   )
 
   const chartData = {
@@ -52,7 +53,8 @@ export default function CategoryPieChart({ items }: { items: any[] }) {
       {
         data,
         backgroundColor: bgColors,
-        borderWidth: 0,
+        borderColor: 'rgba(255,255,255,0.06)',
+        borderWidth: 1,
       },
     ],
   }

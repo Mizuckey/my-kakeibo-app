@@ -81,7 +81,7 @@ export default function HomePage() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setIsOpen(true)}
-            className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 dark:bg-blue-500"
+            className="btn-muted text-white px-3 py-1 rounded"
           >
             ＋ 登録
           </button>
