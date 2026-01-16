@@ -7,11 +7,13 @@ import AmountCalculator from './AmountCalculator'
 
 export default function AddExpenseForm({
   onSuccess,
+  onClose,
 }: {
   onSuccess: () => void
+  onClose?: () => void
 }) {
   const [date, setDate] = useState('')
-  const [expression, setExpression] = useState('') // 例: "100+200*2"
+  const [expression, setExpression] = useState('')
   const [title, setTitle] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
 
@@ -20,6 +22,8 @@ export default function AddExpenseForm({
 
   const [categoryId, setCategoryId] = useState<number | ''>('')
   const [paymentMethodId, setPaymentMethodId] = useState<number | ''>('')
+
+  const maxTitleLength = 40
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -70,75 +74,93 @@ export default function AddExpenseForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
-      {successMessage && (
-        <div className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 p-2 rounded mb-4">
-          {successMessage}
+      {/* ヘッダー：左上にタイトル、右上に閉じるボタン */}
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-medium">支出登録</h3>
+      </div>
+
+      <div className="max-h-[60vh] overflow-auto pr-2 space-y-3">
+        {successMessage && (
+          <div className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 p-2 rounded mb-4">
+            {successMessage}
+          </div>
+        )}
+
+        <input
+          type="date"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+          aria-label="日付"
+          className="w-full border p-2 rounded bg-white text-gray-900 border-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+
+        {/* タイトル入力：小さめ、高さ調整、文字数制限とカウント */}
+        <div>
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value.slice(0, maxTitleLength))}
+            placeholder="タイトル（例：昼食代）"
+            maxLength={maxTitleLength}
+            className="w-full border p-2 rounded h-9 text-sm bg-white text-gray-900 border-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <div className="text-right text-xs text-gray-500 mt-1">
+            {title.length}/{maxTitleLength}
+          </div>
         </div>
-      )}
 
-      <input
-        type="date"
-        value={date}
-        onChange={(e) => setDate(e.target.value)}
-        className="w-full border p-2 rounded bg-white text-gray-900 border-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-      />
+        <select
+          value={categoryId === '' ? '' : String(categoryId)}
+          onChange={(e) =>
+            setCategoryId(e.target.value === '' ? '' : Number(e.target.value))
+          }
+          className="
+            w-full border p-2 rounded
+            bg-white text-gray-900
+            dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600
+          "
+          required
+        >
+          <option value="">カテゴリを選択</option>
+          {categories.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name}
+            </option>
+          ))}
+        </select>
 
-      <textarea
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        placeholder="タイトル"
-        className="w-full border p-2 rounded bg-white text-gray-900 border-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-      />
+        <select
+          value={paymentMethodId === '' ? '' : String(paymentMethodId)}
+          onChange={(e) =>
+            setPaymentMethodId(e.target.value === '' ? '' : Number(e.target.value))
+          }
+          className="
+            w-full border p-2 rounded
+            bg-white text-gray-900
+            dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600
+          "
+          required
+        >
+          <option value="">支払い方法を選択</option>
+          {paymentMethods.map((p) => (
+            <option key={p.id} value={p.id}>
+              {p.name}
+            </option>
+          ))}
+        </select>
 
-      <select
-        value={categoryId}
-        onChange={(e) => setCategoryId(Number(e.target.value))}
-        className="
-          w-full border p-2 rounded
-          bg-white text-gray-900
-          dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600
-        "
-        required
-      >
-        <option value="">選択してください</option>
-        {categories.map((c) => (
-          <option key={c.id} value={c.id}>
-            {c.name}
-          </option>
-        ))}
-      </select>
-
-      <select
-        value={paymentMethodId}
-        onChange={(e) => setPaymentMethodId(Number(e.target.value))}
-        className="
-          w-full border p-2 rounded
-          bg-white text-gray-900
-          dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600
-        "
-        required
-      >
-        <option value="">選択してください</option>
-        {paymentMethods.map((p) => (
-          <option key={p.id} value={p.id}>
-            {p.name}
-          </option>
-        ))}
-      </select>
-
-      <input
-        type="text"
-        inputMode="numeric"
-        value={expression}
-        onChange={(e) =>
-          setExpression(e.target.value.replace(/[^0-9+\-*/.]/g, ''))
-        }
-        className="w-full border p-2 rounded text-right text-xl"
-      />
-      <AmountCalculator
-        value={expression}
-        onChange={setExpression}
-      />
+        <input
+          type="text"
+          inputMode="numeric"
+          value={expression}
+          onChange={(e) =>
+            setExpression(e.target.value.replace(/[^0-9+\-*/.]/g, ''))
+          }
+          placeholder="金額"
+          className="w-full border p-2 rounded text-right text-xl bg-white text-gray-900 border-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <AmountCalculator value={expression} onChange={setExpression} />
+      </div>
 
       <button
         type="submit"

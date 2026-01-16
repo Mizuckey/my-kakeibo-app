@@ -54,7 +54,7 @@ export default function HomePage() {
 
       {isOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
-          <div className="bg-white dark:bg-gray-800 p-4 rounded w-full max-w-md">
+          <div className="bg-white dark:bg-gray-800 p-4 rounded w-full max-w-md relative">
             <AddExpenseForm
               onSuccess={() => {
                 setIsOpen(false)
@@ -63,9 +63,10 @@ export default function HomePage() {
             />
             <button
               onClick={() => setIsOpen(false)}
-              className="mt-2 text-sm text-gray-500 dark:text-gray-400"
+              aria-label="閉じる"
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 dark:text-gray-300 text-lg"
             >
-              閉じる
+              ×
             </button>
           </div>
         </div>
