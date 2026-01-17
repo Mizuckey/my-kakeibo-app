@@ -102,16 +102,23 @@ export default function HomePage() {
         <div className="flex-1 w-full space-y-6">
           {itemsForMonth.length === 0 && <div className="text-gray-500">データがありません</div>}
 
-          <ul className="w-full space-y-2 list-content">
-            {itemsForMonth.map((e: Expense, idx) => (
+          <ul className="w-full space-y-2">
+            {itemsForMonth.map((e: any, idx: number) => (
               <li
                 key={e.id}
-                className="w-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 rounded animate-list-item"
+                className="w-full flex items-center justify-between gap-3 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 rounded text-sm animate-list-item"
                 style={{ animationDelay: `${idx * 40}ms` }}
               >
-                <div className="text-sm text-gray-500 dark:text-gray-400">{e.date}</div>
-                <div className="font-medium">{e.title ?? '（タイトルなし）'}</div>
-                <div className="text-right font-bold">¥{e.amount}</div>
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="text-sm text-gray-500 dark:text-gray-400 w-20 flex-shrink-0">
+                    {e.date}
+                  </div>
+                  <div className="font-medium truncate min-w-0">
+                    {e.title ?? '（タイトルなし）'}
+                  </div>
+                </div>
+
+                <div className="text-right font-semibold text-sm">¥{e.amount}</div>
               </li>
             ))}
           </ul>
@@ -126,13 +133,13 @@ export default function HomePage() {
       </div>
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden">
           {/* オーバーレイ（フェードイン） */}
           <div className="absolute inset-0 modal-overlay bg-black/50" />
 
-          {/* モーダル本体（ポップアップアニメーション） */}
-          <div className="relative z-10 w-full max-w-md px-4">
-            <div className="modal-content bg-white dark:bg-gray-800 p-4 rounded shadow-lg relative">
+          {/* モーダル本体：左右に余白を入れて小さい画面で横スクロールしないようにする */}
+          <div className="relative z-10 w-full px-4">
+            <div className="modal-content bg-white dark:bg-gray-800 p-4 rounded shadow-lg relative mx-auto w-full max-w-md box-border overflow-hidden">
               <AddExpenseForm
                 onSuccess={() => {
                   setIsOpen(false)
@@ -149,7 +156,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* アニメーション定義（クライアントコンポーネント内で完結） */}
+          {/* アニメーションは globals.css に移している場合はここを削除してもOK */}
           <style jsx>{`
             @keyframes overlayFadeIn {
               from { opacity: 0; }
@@ -159,20 +166,11 @@ export default function HomePage() {
               from { opacity: 0; transform: translateY(12px) scale(0.98); }
               to { opacity: 1; transform: translateY(0) scale(1); }
             }
-            @keyframes listPop {
-              from { opacity: 0; transform: translateY(8px); }
-              to { opacity: 1; transform: translateY(0); }
-            }
             .modal-overlay {
               animation: overlayFadeIn 220ms ease-out forwards;
             }
             .modal-content {
               animation: popUp 260ms cubic-bezier(.2,.9,.3,1) forwards;
-            }
-            .list-item {
-              opacity: 0;
-              transform: translateY(8px);
-              animation: listPop 360ms cubic-bezier(.2,.9,.3,1) forwards;
             }
           `}</style>
         </div>

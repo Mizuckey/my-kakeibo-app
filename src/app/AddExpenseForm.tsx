@@ -10,8 +10,16 @@ export default function AddExpenseForm({
 }: {
   onSuccess: () => void
 }) {
-  const [date, setDate] = useState('')
-  const [expression, setExpression] = useState('')
+  const getToday = () => {
+    const d = new Date()
+    const y = d.getFullYear()
+    const m = String(d.getMonth() + 1).padStart(2, '0')
+    const day = String(d.getDate()).padStart(2, '0')
+    return `${y}-${m}-${day}`
+  }
+
+  const [date, setDate] = useState<string>(getToday())
+  const [expression, setExpression] = useState('') // 計算式 or 数値文字列（電卓でのみ変更）
   const [title, setTitle] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
 
@@ -23,15 +31,41 @@ export default function AddExpenseForm({
 
   const maxTitleLength = 40
 
+  // expression を安全に評価して数値を返す（入力は電卓で制限されている想定）
+  const evalExpression = (expr: string) => {
+    if (!expr) return NaN
+    try {
+      // 許可されている文字のみで構成されている前提: [0-9+\-*/().]
+      if (!/^[0-9+\-*/().\s]+$/.test(expr)) return NaN
+      // eslint-disable-next-line no-new-func
+      const fn = new Function(`return (${expr})`)
+      const v = fn()
+      return typeof v === 'number' && Number.isFinite(v) ? v : NaN
+    } catch {
+      return NaN
+    }
+  }
+
+  const formatAmount = (n: number | NaN) => {
+    if (!Number.isFinite(n)) return ''
+    return n.toLocaleString('ja-JP')
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    const amountValue = evalExpression(expression)
+
+    if (!Number.isFinite(amountValue)) {
+      alert('金額が無効です。電卓で金額を入力してください。')
+      return
+    }
 
     const { error } = await supabase.from('expenses').insert([
       {
         date,
         category_id: categoryId,
         payment_method_id: paymentMethodId,
-        amount: Number(expression),
+        amount: amountValue,
         title,
       },
     ])
@@ -42,7 +76,7 @@ export default function AddExpenseForm({
     }
 
     setSuccessMessage('登録しました')
-    setDate('')
+    setDate(getToday())
     setCategoryId('')
     setExpression('')
     setPaymentMethodId('')
@@ -53,26 +87,26 @@ export default function AddExpenseForm({
 
   useEffect(() => {
     const fetchMasters = async () => {
-      const { data: categories } = await supabase
+      const { data: cats } = await supabase
         .from('categories')
         .select('id, name')
         .order('sort_order')
-
-      const { data: paymentMethods } = await supabase
+      const { data: pays } = await supabase
         .from('payment_methods')
         .select('id, name')
         .order('sort_order')
 
-      setCategories(categories ?? [])
-      setPaymentMethods(paymentMethods ?? [])
+      setCategories(cats ?? [])
+      setPaymentMethods(pays ?? [])
     }
-
     fetchMasters()
   }, [])
 
+  const evaluated = evalExpression(expression)
+  const formatted = formatAmount(evaluated)
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-3">
-      {/* ヘッダー：左上にタイトル、右上に閉じるボタン */}
+    <form onSubmit={handleSubmit} className="space-y-3 w-full max-w-full box-border">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-medium">支出登録</h3>
       </div>
@@ -89,7 +123,7 @@ export default function AddExpenseForm({
           value={date}
           onChange={(e) => setDate(e.target.value)}
           aria-label="日付"
-          className="w-full border p-2 rounded bg-white text-gray-900 border-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full max-w-full border p-2 rounded bg-white text-gray-900 border-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
 
         {/* タイトル入力：小さめ、高さ調整、文字数制限とカウント */}
@@ -147,22 +181,18 @@ export default function AddExpenseForm({
           ))}
         </select>
 
-        <input
-          type="text"
-          inputMode="numeric"
-          value={expression}
-          onChange={(e) =>
-            setExpression(e.target.value.replace(/[^0-9+\-*/.]/g, ''))
-          }
-          placeholder="金額"
-          className="w-full border p-2 rounded text-right text-xl bg-white text-gray-900 border-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+        {/* 金額表示：電卓のみで操作、直接編集不可 */}
+        <div className="w-full max-w-full border p-2 rounded text-right text-xl bg-white text-gray-900 border-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600">
+          <span className="mr-2">¥</span>
+          <span className="inline-block min-w-[6ch]">{formatted || '0'}</span>
+        </div>
+
         <AmountCalculator value={expression} onChange={setExpression} />
       </div>
 
       <button
         type="submit"
-        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400"
+        className="btn-muted text-white px-4 py-2 rounded"
       >
         登録する
       </button>
