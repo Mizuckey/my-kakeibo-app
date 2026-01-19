@@ -6,7 +6,7 @@ export default function Modal({
   isOpen,
   onClose,
   children,
-  maxWidth = 'max-w-md',
+  maxWidth = 'max-w-sm',
 }: {
   isOpen: boolean
   onClose: () => void

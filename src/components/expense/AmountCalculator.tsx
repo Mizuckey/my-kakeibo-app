@@ -32,14 +32,14 @@ export default function Calculator({ value, onChange }: Props) {
   }
 
   return (
-    <div className="grid grid-cols-4 gap-2 mt-3">
+    <div className="grid grid-cols-4 gap-2 mt-3 max-w-full">
       {buttons.map((b) => (
         <button
           key={b}
           type="button"
           onClick={() => handleClick(b)}
           className="
-            border rounded p-3 text-lg
+            border rounded p-3 text-lg min-w-0 flex-shrink-0
             bg-gray-100 dark:bg-gray-700
           "
         >
@@ -50,7 +50,7 @@ export default function Calculator({ value, onChange }: Props) {
       <button
         type="button"
         onClick={() => onChange('')}
-        className="col-span-2 border rounded p-3 bg-red-200 dark:bg-red-800"
+        className="col-span-2 border rounded p-3 bg-red-200 dark:bg-red-800 min-w-0 flex-shrink-0"
       >
         C
       </button>
@@ -58,7 +58,7 @@ export default function Calculator({ value, onChange }: Props) {
       <button
         type="button"
         onClick={() => onChange(calculate(value))}
-        className="col-span-2 border rounded p-3 bg-blue-600 text-white"
+        className="col-span-2 border rounded p-3 bg-blue-600 text-white min-w-0 flex-shrink-0"
       >
         =
       </button>
