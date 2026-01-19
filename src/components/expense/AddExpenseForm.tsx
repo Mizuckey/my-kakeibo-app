@@ -46,7 +46,7 @@ export default function AddExpenseForm({
     }
   }
 
-  const formatAmount = (n: number | NaN) => {
+  const formatAmount = (n: number) => {
     if (!Number.isFinite(n)) return ''
     return n.toLocaleString('ja-JP')
   }
