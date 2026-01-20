@@ -134,3 +134,9 @@ input[type="date"]:focus {
   transform: translateY(8px);
   animation: listPop 360ms cubic-bezier(.2,.9,.3,1) forwards;
 }
+
+/* 日付入力の幅を制限 */
+input[type="date"] {
+  max-width: 100%;
+  box-sizing: border-box;
+}
