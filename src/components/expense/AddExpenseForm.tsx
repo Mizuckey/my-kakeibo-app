@@ -118,13 +118,15 @@ export default function AddExpenseForm({
           </div>
         )}
 
-        <input
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          aria-label="日付"
-          className="w-full max-w-full border p-2 rounded bg-white text-gray-900 border-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+        <div className="w-full max-w-full overflow-hidden">
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            aria-label="日付"
+            className="w-full border p-2 rounded bg-white text-gray-900 border-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 box-border"
+          />
+        </div>
 
         {/* タイトル入力：小さめ、高さ調整、文字数制限とカウント */}
         <div>
