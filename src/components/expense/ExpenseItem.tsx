@@ -12,15 +12,16 @@ type Props = {
 
 export default function ExpenseItem({ expense, index, onUpdate, onDelete }: Props) {
   const [isEditOpen, setIsEditOpen] = useState(false)
-  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false)
 
   const handleDelete = async () => {
-    const success = await onDelete(expense.id)
-    if (success) {
-      setIsDeleteConfirmOpen(false)
-      onUpdate()
-    } else {
-      alert('削除に失敗しました')
+    if (confirm('この支出データを削除しますか？')) {
+      const success = await onDelete(expense.id)
+      if (success) {
+        setIsEditOpen(false)
+        onUpdate()
+      } else {
+        alert('削除に失敗しました')
+      }
     }
   }
 
@@ -52,15 +53,23 @@ export default function ExpenseItem({ expense, index, onUpdate, onDelete }: Prop
           </div>
           <button
             onClick={() => setIsEditOpen(true)}
-            className="text-gray-400 hover:text-gray-600 text-sm px-2 py-1 rounded"
+            className="text-gray-400 hover:text-gray-600 p-1 rounded"
+            aria-label="編集"
           >
-            編集
-          </button>
-          <button
-            onClick={() => setIsDeleteConfirmOpen(true)}
-            className="text-red-400 hover:text-red-600 text-sm px-2 py-1 rounded"
-          >
-            削除
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-4 h-4"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
+              />
+            </svg>
           </button>
         </div>
       </li>
@@ -75,32 +84,8 @@ export default function ExpenseItem({ expense, index, onUpdate, onDelete }: Prop
             setIsEditOpen(false)
             onUpdate()
           }}
+          onDelete={handleDelete}
         />
-      </Modal>
-
-      <Modal
-        isOpen={isDeleteConfirmOpen}
-        onClose={() => setIsDeleteConfirmOpen(false)}
-        maxWidth="max-w-xs"
-      >
-        <div className="text-center">
-          <h3 className="text-lg font-medium mb-4">削除確認</h3>
-          <p className="text-sm mb-4">この支出データを削除しますか？</p>
-          <div className="flex gap-2 justify-center">
-            <button
-              onClick={() => setIsDeleteConfirmOpen(false)}
-              className="px-4 py-2 text-gray-500 hover:text-gray-700"
-            >
-              キャンセル
-            </button>
-            <button
-              onClick={handleDelete}
-              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-            >
-              削除
-            </button>
-          </div>
-        </div>
       </Modal>
     </>
   )

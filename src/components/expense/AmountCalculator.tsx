@@ -50,7 +50,7 @@ export default function Calculator({ value, onChange }: Props) {
       <button
         type="button"
         onClick={() => onChange('')}
-        className="col-span-2 border rounded p-3 bg-red-100 dark:bg-red-700 min-w-0 flex-shrink-0"
+        className="col-span-2 border rounded p-3 bg-red-300 dark:bg-red-300 min-w-0 flex-shrink-0"
       >
         C
       </button>
@@ -58,7 +58,7 @@ export default function Calculator({ value, onChange }: Props) {
       <button
         type="button"
         onClick={() => onChange(calculate(value))}
-        className="col-span-2 border rounded p-3 bg-blue-400 text-white min-w-0 flex-shrink-0"
+        className="col-span-2 border rounded p-3 bg-blue-300 text-white min-w-0 flex-shrink-0"
       >
         =
       </button>

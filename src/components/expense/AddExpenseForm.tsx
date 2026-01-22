@@ -9,9 +9,11 @@ import AmountCalculator from './AmountCalculator'
 export default function AddExpenseForm({
   onSuccess,
   expense, // 編集時は渡す
+  onDelete, // 編集時の削除
 }: {
   onSuccess: () => void
   expense?: Expense
+  onDelete?: () => void
 }) {
   const isEdit = !!expense
 
@@ -208,12 +210,23 @@ export default function AddExpenseForm({
         <AmountCalculator value={expression} onChange={setExpression} />
       </div>
 
-      <button
-        type="submit"
-        className="btn-muted text-white px-4 py-2 rounded"
-      >
-        {isEdit ? '更新する' : '登録する'}
-      </button>
+      <div className="flex gap-2">
+        <button
+          type="submit"
+          className="btn-muted text-white px-4 py-2 rounded flex-1"
+        >
+          {isEdit ? '更新する' : '登録する'}
+        </button>
+        {isEdit && onDelete && (
+          <button
+            type="button"
+            onClick={onDelete}
+            className="bg-red-400 text-white px-4 py-2 rounded hover:bg-red-500"
+          >
+            削除
+          </button>
+        )}
+      </div>
     </form>
   )
 }
