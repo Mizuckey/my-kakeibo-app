@@ -9,7 +9,7 @@ import Modal from '@/components/ui/Modal'
 import { useExpenses } from '@/hooks/useExpenses'
 
 export default function HomePage() {
-  const { expenses, loading, reload } = useExpenses()
+  const { expenses, loading, reload, deleteExpense } = useExpenses()
   const [isOpen, setIsOpen] = useState(false)
   const [displayMonth, setDisplayMonth] = useState(() => {
     const d = new Date()
@@ -91,7 +91,7 @@ export default function HomePage() {
       {/* メイン：モバイルではグラフ上（中央配置）、リストは幅いっぱいになる */}
       <div className="flex flex-col-reverse md:flex-row gap-6 items-start w-full">
         <div className="flex-1 w-full space-y-6">
-          <ExpenseList expenses={itemsForMonth} />
+          <ExpenseList expenses={itemsForMonth} onUpdate={reload} onDelete={deleteExpense} />
         </div>
 
         {/* モバイル時に中央寄せするため flex と justify-center を追加 */}

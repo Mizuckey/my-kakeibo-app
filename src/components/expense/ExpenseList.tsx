@@ -3,9 +3,11 @@ import ExpenseItem from './ExpenseItem'
 
 type Props = {
   expenses: Expense[]
+  onUpdate: () => void
+  onDelete: (id: number) => Promise<boolean>
 }
 
-export default function ExpenseList({ expenses }: Props) {
+export default function ExpenseList({ expenses, onUpdate, onDelete }: Props) {
   if (expenses.length === 0) {
     return <div className="text-gray-500">データがありません</div>
   }
@@ -17,6 +19,8 @@ export default function ExpenseList({ expenses }: Props) {
           key={e.id}
           expense={e}
           index={idx}
+          onUpdate={onUpdate}
+          onDelete={onDelete}
         />
       ))}
     </ul>

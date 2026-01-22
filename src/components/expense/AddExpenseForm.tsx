@@ -1,15 +1,20 @@
-// 登録フォーム
+// 登録・編集フォーム
 'use client'
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
+import { Expense } from '@/types/expense'
 import AmountCalculator from './AmountCalculator'
 
 export default function AddExpenseForm({
   onSuccess,
+  expense, // 編集時は渡す
 }: {
   onSuccess: () => void
+  expense?: Expense
 }) {
+  const isEdit = !!expense
+
   const getToday = () => {
     const d = new Date()
     const y = d.getFullYear()
@@ -18,16 +23,16 @@ export default function AddExpenseForm({
     return `${y}-${m}-${day}`
   }
 
-  const [date, setDate] = useState<string>(getToday())
-  const [expression, setExpression] = useState('') // 計算式 or 数値文字列（電卓でのみ変更）
-  const [title, setTitle] = useState('')
+  const [date, setDate] = useState<string>(expense?.date || getToday())
+  const [expression, setExpression] = useState(expense ? String(expense.amount) : '') // 編集時は金額をセット
+  const [title, setTitle] = useState(expense?.title || '')
   const [successMessage, setSuccessMessage] = useState('')
 
   const [categories, setCategories] = useState<{ id: number; name: string }[]>([])
   const [paymentMethods, setPaymentMethods] = useState<{ id: number; name: string }[]>([])
 
-  const [categoryId, setCategoryId] = useState<number | ''>('')
-  const [paymentMethodId, setPaymentMethodId] = useState<number | ''>('')
+  const [categoryId, setCategoryId] = useState<number | ''>(expense?.category_id || '')
+  const [paymentMethodId, setPaymentMethodId] = useState<number | ''>(expense?.payment_method_id || '')
 
   const maxTitleLength = 40
 
@@ -60,27 +65,38 @@ export default function AddExpenseForm({
       return
     }
 
-    const { error } = await supabase.from('expenses').insert([
-      {
-        date,
-        category_id: categoryId,
-        payment_method_id: paymentMethodId,
-        amount: amountValue,
-        title,
-      },
-    ])
+    const data = {
+      date,
+      category_id: categoryId,
+      payment_method_id: paymentMethodId,
+      amount: amountValue,
+      title,
+    }
 
-    if (error) {
-      alert(error.message)
+    let success = false
+    if (isEdit && expense) {
+      // 編集
+      const { error } = await supabase.from('expenses').update(data).eq('id', expense.id)
+      success = !error
+    } else {
+      // 新規
+      const { error } = await supabase.from('expenses').insert([data])
+      success = !error
+    }
+
+    if (!success) {
+      alert('保存に失敗しました')
       return
     }
 
-    setSuccessMessage('登録しました')
-    setDate(getToday())
-    setCategoryId('')
-    setExpression('')
-    setPaymentMethodId('')
-    setTitle('')
+    setSuccessMessage(isEdit ? '更新しました' : '登録しました')
+    if (!isEdit) {
+      setDate(getToday())
+      setCategoryId('')
+      setExpression('')
+      setPaymentMethodId('')
+      setTitle('')
+    }
 
     setTimeout(onSuccess, 800)
   }
@@ -108,7 +124,7 @@ export default function AddExpenseForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-3 w-full max-w-full box-border">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-medium">支出登録</h3>
+        <h3 className="text-lg font-medium">{isEdit ? '支出編集' : '支出登録'}</h3>
       </div>
 
       <div className="max-h-[60vh] overflow-auto pr-2 space-y-3">
@@ -196,7 +212,7 @@ export default function AddExpenseForm({
         type="submit"
         className="btn-muted text-white px-4 py-2 rounded"
       >
-        登録する
+        {isEdit ? '更新する' : '登録する'}
       </button>
     </form>
   )
