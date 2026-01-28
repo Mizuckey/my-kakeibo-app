@@ -70,7 +70,7 @@ export default function CategoryPieChart({
       <h3 className="text-sm font-medium mb-2">カテゴリ別割合</h3>
       <Pie data={chartData} />
       <div className="mt-3 text-left text-lg font-bold text-gray-900 dark:text-gray-100">
-        合計 ¥{data.reduce((s, v) => s + Number(v), 0)}
+        合計 ¥{data.reduce((s, v) => s + Number(v), 0).toLocaleString('ja-JP')}
       </div>
     </div>
   )

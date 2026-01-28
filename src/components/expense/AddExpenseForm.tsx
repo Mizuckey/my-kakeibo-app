@@ -204,7 +204,7 @@ export default function AddExpenseForm({
         {/* 金額表示：電卓のみで操作、直接編集不可 */}
         <div className="w-full max-w-full border p-2 rounded text-right text-xl bg-white text-gray-900 border-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600">
           <span className="mr-2">¥</span>
-          <span className="inline-block min-w-[6ch]">{formatted || '0'}</span>
+          <span className="inline-block min-w-[6ch]">{Number(formatted || '0').toLocaleString('ja-JP') || '0'}</span>
         </div>
 
         <AmountCalculator value={expression} onChange={setExpression} />

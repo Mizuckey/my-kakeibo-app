@@ -49,7 +49,7 @@ export default function ExpenseItem({ expense, index, onUpdate, onDelete }: Prop
 
         <div className="flex items-center gap-2">
           <div className="text-right font-semibold text-sm">
-            ¥{expense.amount}
+            ¥{expense.amount.toLocaleString('ja-JP')}
           </div>
           <button
             onClick={() => setIsEditOpen(true)}

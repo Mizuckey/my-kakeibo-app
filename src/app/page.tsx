@@ -7,6 +7,7 @@ import CategoryPieChart from '../components/charts/CategoryPieChart'
 import ExpenseList from '@/components/expense/ExpenseList'
 import Modal from '@/components/ui/Modal'
 import { useExpenses } from '@/hooks/useExpenses'
+import { isHolidayInJapan } from '@/lib/holidays'
 
 export default function HomePage() {
   const { expenses, loading, reload, deleteExpense } = useExpenses()
@@ -17,12 +18,34 @@ export default function HomePage() {
   })
   const pad = (n: number) => String(n).padStart(2, '0')
 
-  // 表示期間：前月25日 〜 当月24日
+  // 前月の25日を基準に、土日祝日の場合は前の金曜日に変更
+  const getStartDate = (year: number, month: number): Date => {
+    let startDate = new Date(year, month - 1, 25, 0, 0, 0, 0)
+    const dayOfWeek = startDate.getDay()
+    const isHoliday = isHolidayInJapan(startDate)
+
+    // 土曜日（6）、日曜日（0）、祝日の場合は前の金曜日に変更
+    if (dayOfWeek === 6 || dayOfWeek === 0 || isHoliday) {
+      const daysToSubtract = dayOfWeek === 0 ? 2 : dayOfWeek === 6 ? 1 : 1
+      startDate.setDate(startDate.getDate() - daysToSubtract)
+      // 祝日の場合はさらに調整
+      while (isHolidayInJapan(startDate)) {
+        startDate.setDate(startDate.getDate() - 1)
+      }
+    }
+    return startDate
+  }
+
+  // 表示期間：前月の調整済み日付 〜 翌月の調整済み日付-1日
   const range = useMemo(() => {
     const year = displayMonth.getFullYear()
-    const month = displayMonth.getMonth()
-    const start = new Date(year, month - 1, 25, 0, 0, 0, 0)
-    const end = new Date(year, month, 24, 23, 59, 59, 999)
+    const month = displayMonth.getMonth() + 1
+
+    const start = getStartDate(year, month)
+    const nextMonthStart = getStartDate(year + (month === 12 ? 1 : 0), month === 12 ? 1 : month + 1)
+    nextMonthStart.setDate(nextMonthStart.getDate() - 1)
+    const end = new Date(nextMonthStart.getFullYear(), nextMonthStart.getMonth(), nextMonthStart.getDate(), 23, 59, 59, 999)
+
     return { start, end }
   }, [displayMonth])
 
