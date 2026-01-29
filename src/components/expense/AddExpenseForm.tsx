@@ -55,7 +55,7 @@ export default function AddExpenseForm({
 
   const formatAmount = (n: number) => {
     if (!Number.isFinite(n)) return ''
-    return n.toLocaleString('ja-JP')
+    return String(n)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
