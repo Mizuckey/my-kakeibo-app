@@ -36,5 +36,30 @@ npm run dev
 ├── postcss.config.mjs       # PostCSS設定
 ├── public/                  # 画像やfaviconなどの静的ファイル
 ├── src/                     # コンポーネントやhooksなどのソースコード
+    ├── app
+    │   ├── favicon.ico
+    │   ├── globals.css
+    │   ├── layout.tsx
+    │   └── page.tsx
+    ├── components
+    │   ├── calendar
+    │   │   └── MonthSwitcher.tsx
+    │   ├── charts
+    │   │   └── CategoryPieChart.tsx
+    │   ├── expense
+    │   │   ├── AddExpenseForm.tsx
+    │   │   ├── AmountCalculator.tsx
+    │   │   ├── ExpenseItem.tsx
+    │   │   └── ExpenseList.tsx
+    │   └── ui
+    │       └── Modal.tsx
+    ├── hooks
+    │   └── useExpenses.ts
+    ├── lib
+    │   ├── expenses.ts
+    │   ├── holidays.ts
+    │   └── supabaseClient.ts
+    └── types
+        └── expense.ts
 └── tsconfig.json            # TypeScript設定
 

@@ -62,7 +62,13 @@ export default function HomePage() {
   const goNext = () =>
     setDisplayMonth((d) => new Date(d.getFullYear(), d.getMonth() + 1, 1))
 
-  const label = displayMonth.toLocaleString('ja-JP', {
+  const labelDate = new Date(
+    displayMonth.getFullYear(),
+    displayMonth.getMonth() + 1,
+    1
+  )
+
+  const label = labelDate.toLocaleString('ja-JP', {
     year: 'numeric',
     month: 'long',
   })
